@@ -8632,6 +8632,11 @@ float Perfected_Instinct_Dodge(int attacker, int victim, StatusEffect Apply_Mast
 		return 0.7;
 	if(f_TimeFrozenStill[victim] > GetGameTime(victim))
 		return 0.7;
+	if(b_thisNpcIsARaid[victim] || EntRefToEntIndex(RaidBossActive) == victim)
+	{
+		if(GetRandomFloat(0.0, 1.0) < 0.9)
+			return 0.7;
+	}
 	float HitChance = 0.8;
 	int MaxHealth = ReturnEntityMaxHealth(victim);
 	int Health = GetEntProp(victim, Prop_Data, "m_iHealth");
@@ -8644,8 +8649,6 @@ float Perfected_Instinct_Dodge(int attacker, int victim, StatusEffect Apply_Mast
 
 	if(HitChance >= 0.75)
 		HitChance = 0.75;
-	if(b_thisNpcIsARaid[victim] || EntRefToEntIndex(RaidBossActive) == victim)
-		HitChance *= 0.1;
 
 	if(GetRandomFloat(0.0, 1.0) < HitChance)
 		return 0.7;
@@ -10137,20 +10140,6 @@ void StatusEffects_HeartBroken()
 	strcopy(data.AboveEnemyDisplay, sizeof(data.AboveEnemyDisplay), ""); //dont display above head, so empty
 	//-1.0 means unused
 	data.DamageTakenMulti 			= -1.0;
-	data.DamageDealMulti			= -1.0;
-	//Make sure it isnt ignored, set it to 0.0, on need for extra func checks either.
-	data.MovementspeedModif			= -1.0;
-	data.Positive 					= true;
-	data.ShouldScaleWithPlayerCount = false;
-	data.Slot						= 0; //0 means ignored
-	data.SlotPriority				= 0; //if its higher, then the lower version is entirely ignored.
-	StatusEffect_AddGlobal(data);
-
-	strcopy(data.BuffName, sizeof(data.BuffName), "HeartBroken Animation");
-	strcopy(data.HudDisplay, sizeof(data.HudDisplay), "⛨");
-	strcopy(data.AboveEnemyDisplay, sizeof(data.AboveEnemyDisplay), ""); //dont display above head, so empty
-	//-1.0 means unused
-	data.DamageTakenMulti 			= 0.75;
 	data.DamageDealMulti			= -1.0;
 	//Make sure it isnt ignored, set it to 0.0, on need for extra func checks either.
 	data.MovementspeedModif			= -1.0;

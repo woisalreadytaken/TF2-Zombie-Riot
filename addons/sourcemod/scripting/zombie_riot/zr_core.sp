@@ -880,8 +880,6 @@ bool CanMapSpawnPickups()
 }
 void ZR_MapStart()
 {
-	IsZRMap = false;
-	
 	char mapname[64];
 	GetMapName(mapname, sizeof(mapname));
 	if(StrContains(mapname, "zr_") == 0 || StrContains(mapname, "vsh_zr_") == 0)
@@ -899,12 +897,6 @@ void ZR_MapStart()
 		IsZRMap = false;
 		CanSpawnPickups = false;
 	}
-	
-	// Consider VSH maps as ZR maps
-	if(StrContains(mapname, "vsh_zr_") == 0)
-		IsZRMap = false;
-	if(StrContains(mapname, "vsh_") == 0)
-		IsZRMap = false;
 
 	MusicString1.Clear();
 	MusicString2.Clear();
