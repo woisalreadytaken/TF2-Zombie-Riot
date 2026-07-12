@@ -399,6 +399,14 @@ static char m_cGibModelSkeleton[][] = {
     "models/bots/skeleton_sniper/skeleton_sniper_gib_head.mdl"
 };
 
+// we only want the 3 biggest gibs
+static const char g_GibModelScout[][] =
+{
+	"models/player/gibs/scoutgib006.mdl", // torso
+	"models/player/gibs/scoutgib003.mdl", // waist
+	"models/player/gibs/scoutgib007.mdl", // head
+};
+
 void NPCStats_PluginStart()
 {
 	h_ColoredWearables = new ArrayList(sizeof(WearableColor));
@@ -507,6 +515,11 @@ void OnMapStart_NPC_Base()
 	for (int i = 0; i < sizeof(m_cGibModelSkeleton); i++)
 	{
 		PrecacheModel(m_cGibModelSkeleton[i], true);
+	}
+	
+	for (int i = 0; i < (sizeof(g_GibModelScout)); i++)
+	{
+		PrecacheModel(g_GibModelScout[i]);
 	}
 	#endif
 }
@@ -7480,6 +7493,7 @@ static char m_cGibModelMetal[][] =
 	"models/gibs/scanner_gib01.mdl",
 	"models/gibs/metal_gib2.mdl"
 };
+
 void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = false, int attacker = -1)
 {
 	CClotBody npc = view_as<CClotBody>(pThis);
@@ -7503,7 +7517,7 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 
 
 	GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", startPosition);
-				
+	
 	for(int GibLoop; GibLoop < 3; GibLoop++)
 	{
 		int prop = CreateEntityByName("prop_physics_multiplayer");
@@ -7511,7 +7525,7 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 			return; //Emergency backup
 		float TempPosition[3];
 		float TempForce[3];
-
+		
 		TempPosition = startPosition;
 
 		switch(GibLoop)
@@ -7550,7 +7564,8 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 		ScaleVector(TempForce, GetRandomFloat(0.9, 1.1));
 		
 		//This gib in specific has too much knockback.
-
+		bool classModel;
+		
 		if(npc.m_iBleedType == BLEEDTYPE_METAL)
 			DispatchKeyValue(prop, "model", m_cGibModelMetal[GibLoop]);
 		else if (npc.m_iBleedType == BLEEDTYPE_SKELETON)
@@ -7559,7 +7574,18 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 			SetEntProp(prop, Prop_Send, "m_nSkin", GetEntProp(npc.index, Prop_Send, "m_nSkin", 1));
 		}
 		else
-			DispatchKeyValue(prop, "model", m_cGibModelDefault[GibLoop]);
+		{
+			char model[PLATFORM_MAX_PATH];
+			classModel = SetGibToClassModel(pThis, model, sizeof(model), GibLoop);
+			if (classModel)
+			{
+				DispatchKeyValue(prop, "model", model);
+			}
+			else
+			{
+				DispatchKeyValue(prop, "model", m_cGibModelDefault[GibLoop]);
+			}
+		}
 
 		DispatchKeyValue(prop, "physicsmode", "2");
 		DispatchKeyValue(prop, "massScale", "1.0");
@@ -7596,9 +7622,20 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 			}
 		}
 		CurrentGibCount += 1;
-		DispatchKeyValueVector(prop, "origin",	 TempPosition);
-		DispatchKeyValueVector(prop, "angles",	 ang);
-		DispatchSpawn(prop);
+		
+		if (classModel)
+		{
+			DispatchKeyValueVector(prop, "origin", startPosition);
+			
+			// Setting angles doesn't work through DispatchKeyValueVector doesn't seem to work, teleport later
+			GetEntPropVector(pThis, Prop_Data, "m_angRotation", ang);
+			ang[0] = 0.0;
+		}
+		else
+		{
+			DispatchKeyValueVector(prop, "origin", TempPosition);
+		}
+		
 		float ModelscaleSet = 1.0;
 		if(npc.m_bIsGiant)
 		{
@@ -7624,10 +7661,12 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 		if(GibLoop == 1)
 			ModelscaleSet *= 2.5;
 
-		if(ModelscaleSet != 1.0)
-			SetEntPropFloat(prop, Prop_Send, "m_flModelScale", ModelscaleSet);
-			
-		TeleportEntity(prop, NULL_VECTOR, NULL_VECTOR, TempForce);
+		if (!classModel && ModelscaleSet != 1.0)
+			DispatchKeyValueFloat(prop, "modelscale", ModelscaleSet);
+		
+		DispatchSpawn(prop);
+		
+		TeleportEntity(prop, NULL_VECTOR, ang, TempForce);
 		SetEntityCollisionGroup(prop, 2); //COLLISION_GROUP_DEBRIS_TRIGGER
 		CreateTimer(Random_time - 1.5, Prop_Gib_FadeSet, EntIndexToEntRef(prop), TIMER_FLAG_NO_MAPCHANGE);
 		CreateTimer(Random_time, Timer_RemoveEntity_Prop_Gib, EntIndexToEntRef(prop), TIMER_FLAG_NO_MAPCHANGE);
@@ -7638,9 +7677,10 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 		{
 			case BLEEDTYPE_NORMAL:
 			{
+				/*
 				if(!EnableSilentMode || !AtEdictLimit(EDICT_EFFECT))
 					ParticleSet = ParticleEffectAt(TempPosition, "blood_trail_red_01_goop", Random_time); 
-				SetEntityRenderColor(prop, 255, 0, 0, 255);
+				SetEntityRenderColor(prop, 255, 0, 0, 255);*/
 				int color[4] = {255,0,0,255};
 				NpcGibEnemyExtreme(pThis, color);
 			}
@@ -7660,10 +7700,10 @@ void Npc_DoGibLogic(int pThis, float GibAmount = 1.0, bool forcesilentMode = fal
 					ParticleSet = ParticleEffectAt(TempPosition, "blood_impact_green_01", Random_time); 
 				SetEntityRenderColor(prop, 0, 255, 0, 255);
 			}
-			/*case BLEEDTYPE_SKELETON:
-			{
-				Skeletons don't bleed, so I'm leaving this blank.
-			}*/
+			//case BLEEDTYPE_SKELETON:
+			//{
+			//	Skeletons don't bleed, so I'm leaving this blank.
+			//}
 			case BLEEDTYPE_DWELLER:
 			{
 				if(!EnableSilentMode || !AtEdictLimit(EDICT_EFFECT))
@@ -12549,10 +12589,12 @@ bool NPCStats_GetCustomChatName(int entity, char[] buffer, int maxlen)
 }
 bool NpcGibEnemyExtreme(int entity, int color[4])
 {
-//	float TempPosition[3];
-//	WorldSpaceCenter(entity, TempPosition);
-//	TE_Particle("tfc_sniper_mist2", TempPosition, NULL_VECTOR, NULL_VECTOR, -1, _, _, _, _, _, _, _, _, _, 0.0);
-	
+	float TempPosition[3];
+	WorldSpaceCenter(entity, TempPosition);
+	ParticleEffectAt(TempPosition, "env_sawblood_mist", 0.1);
+	//TE_Particle("env_sawblood_mist", TempPosition, NULL_VECTOR, NULL_VECTOR, entity, _, _, _, _, _, _, _, _, _, 0.0);
+	//TE_SendToAllInRange(TempPosition, RangeType_Visibility);
+	/*
 	for(int i ; i <6 ; i++)
 	{
 		float TempPosition[3];
@@ -12589,6 +12631,26 @@ bool NpcGibEnemyExtreme(int entity, int color[4])
 		TE_BloodSprite(TempPosition, { 0.0, 0.0, 0.0 }, color[0], color[1], color[2], color[3], Size);
 		TE_SendToAllInRange(TempPosition, RangeType_Visibility);		
 	//	TE_Particle("blood_impact_backscatter", TempPosition, NULL_VECTOR, flangUnused, -1, _, _, _, _, _, _, _, _, _, 0.0);
-	}
+	}*/
+	return true;
+}
+
+bool SetGibToClassModel(int owner, char[] buffer, int maxlen, int id)
+{
+	char model[PLATFORM_MAX_PATH];
+	GetEntPropString(owner, Prop_Data, "m_ModelName", model, sizeof(model));
+	ReplaceString(model, sizeof(model), "\\", "/");
+	
+	if (StrContains(model, "models/player/") != 0)
+		return false;
+	
+	if (StrContains(model, "scout") == -1)
+		return false;
+	
+	int index = id % 3;
+	strcopy(buffer, maxlen, g_GibModelScout[index]);
+	//SetEntityModel(prop, g_GibModelScout[index]);
+	return true;
+	//TE_Particle("skull_island_embers", targPos, NULL_VECTOR, NULL_VECTOR, entity, _, _, _, _, _, _, _, _, _, 0.0);
 	
 }
