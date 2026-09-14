@@ -283,6 +283,7 @@ void InitStatusEffects()
 	StatusEffects_IndexNurseFather();
 	StatusEffects_Gunsaw();
 	StatusEffects_ManaRecharge();
+	StatusEffects_NothingThere();
 }
 
 static int CategoryPage[MAXPLAYERS];
@@ -854,7 +855,7 @@ void StatusEffect_OnTakeDamage_TakenPositive(int victim, int attacker, float &da
 		}
 	}
 #if defined ZR
-	if(RaidbossIgnoreBuildingsLogic(1) && GetTeam(victim) == TFTeam_Red)
+	if(RaidbossIgnoreBuildingsLogic(1) && GetTeam(victim) == TFTeam_Red && !Arena_Mode())
 	{
 		//invert, then convert!
 		float NewRes = 1.0 + ((DamageRes - 1.0) * PlayerCountResBuffScaling);
@@ -922,7 +923,7 @@ void StatusEffect_OnTakeDamage_DealNegative(int victim, int attacker, float &dam
 		}
 	}
 #if defined ZR
-	if(RaidbossIgnoreBuildingsLogic(1) && GetTeam(victim) == TFTeam_Red)
+	if(RaidbossIgnoreBuildingsLogic(1) && GetTeam(victim) == TFTeam_Red && !Arena_Mode())
 	{
 		//invert, then convert!
 		float NewRes = 1.0 + ((DamageRes - 1.0) * PlayerCountResBuffScaling);
@@ -950,7 +951,7 @@ float StatusEffect_OnTakeDamage_TakenNegative(int victim, int attacker, float &b
 	if(attacker <= MaxClients || inflictor <= MaxClients)
 	{
 		//only scale if its a player, and if the attacking npc is red too
-		if(GetTeam(attacker) == TFTeam_Red || GetTeam(inflictor) == TFTeam_Red)
+		if((GetTeam(attacker) == TFTeam_Red || GetTeam(inflictor) == TFTeam_Red) && !Arena_Mode())
 			DamageBuffExtraScaling = PlayerCountBuffScaling;
 	}
 #endif
@@ -1030,7 +1031,7 @@ float StatusEffect_OnTakeDamage_DealPositive(int victim, int attacker, float &ba
 	if(attacker <= MaxClients || inflictor <= MaxClients)
 	{
 		//only scale if its a player, and if the attacking npc is red too
-		if(GetTeam(attacker) == TFTeam_Red || GetTeam(inflictor) == TFTeam_Red)
+		if((GetTeam(attacker) == TFTeam_Red || GetTeam(inflictor) == TFTeam_Red) && !Arena_Mode())
 			DamageBuffExtraScaling = PlayerCountBuffScaling;
 	}
 #endif
@@ -1343,6 +1344,8 @@ bool Status_Effects_AttackspeedBuffChange(int victim, StatusEffect Apply_MasterS
 				if(GetTeam(victim) == TFTeam_Red)
 					ScaleWithCount = true;
 			}
+			if(Arena_Mode())
+				ScaleWithCount = false;
 			if(ScaleWithCount)
 			{
 				BuffAmount = MaxNumBuffValue(Apply_MasterStatusEffect.AttackspeedBuff, 1.0, PlayerCountBuffAttackspeedScaling);
@@ -2872,6 +2875,7 @@ void Func_StunnedHud(int attacker, int victim, StatusEffect Apply_MasterStatusEf
 stock void ExtinguishTargetDebuff(int victim)
 {
 	IgniteFor[victim] = 0;
+	RemoveSpecificBuff(victim, "Black Flames");
 }
 stock void ApplyRapidSuturing(int victim)
 {
@@ -9817,6 +9821,7 @@ static const char ScrambledBlacklist[][] =
 	"Decapitate",
 	"Red Mist",
 	"Call of the Heartbroken",
+	"Nothing There Internal",
 };
 
 ArrayList ScrambledBuffList;
@@ -10875,15 +10880,22 @@ float Sinking_DamageDealFunc(int attacker, int victim, StatusEffect Apply_Master
 void Func_SinkingMaxStacks(int attacker, int victim, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect, int SizeOfChar, char[] HudToDisplay)
 {
 	//only display to client
-	if(HasSpecificBuff(attacker, "Call of the Heartbroken") || Apply_StatusEffect.TotalOwners[attacker])
+	if(attacker == -1)
 	{
-		if(RoundToNearest(Apply_StatusEffect.DataForUse) >= MAXSINKING_STACKS)
-			Format(HudToDisplay, SizeOfChar, "Si", RoundToNearest(Apply_StatusEffect.DataForUse), MAXSINKING_STACKS);
-		else
-			Format(HudToDisplay, SizeOfChar, "Si(%i/%i)", RoundToNearest(Apply_StatusEffect.DataForUse), MAXSINKING_STACKS);
+		Format(HudToDisplay, SizeOfChar, "Si");
 	}
 	else
-		Format(HudToDisplay, SizeOfChar, "");
+	{
+		if(HasSpecificBuff(attacker, "Call of the Heartbroken") || Apply_StatusEffect.TotalOwners[attacker])
+		{
+			if(RoundToNearest(Apply_StatusEffect.DataForUse) >= MAXSINKING_STACKS)
+				Format(HudToDisplay, SizeOfChar, "Si");
+			else
+				Format(HudToDisplay, SizeOfChar, "Si(%i/%i)", RoundToNearest(Apply_StatusEffect.DataForUse), MAXSINKING_STACKS);
+		}
+		else
+			Format(HudToDisplay, SizeOfChar, "");
+	}
 }
 
 void Sinking_TakeDamageAttackerPost(int attacker, int victim, float damage, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect, int damagetype)
@@ -11593,7 +11605,7 @@ float EgoManifestation_SpeedVunc(int victim, StatusEffect Apply_MasterStatusEffe
 	if(LastMann)
 		return 1.0;
 	else
-		return 1.1;
+		return 1.25;
 }
 
 
@@ -11929,9 +11941,9 @@ stock void StatusEffects_PoiseAddStuff_Internal(int victim, int value, float tim
 				Apply_StatusEffect.DataForUse = float(MAXPOISE_COUNT);
 			}
 			Apply_StatusEffect.TimeUntillOver += time;
-			if(Apply_StatusEffect.TimeUntillOver - GetGameTime() >= 15.0)
+			if(Apply_StatusEffect.TimeUntillOver - GetGameTime() >= 25.0)
 			{
-				Apply_StatusEffect.TimeUntillOver = GetGameTime() + 15.0;
+				Apply_StatusEffect.TimeUntillOver = GetGameTime() + 25.0;
 			}
 			E_AL_StatusEffects[victim].SetArray(ArrayPosition, Apply_StatusEffect);
 		}
@@ -11976,10 +11988,17 @@ stock void StatusEffects_FragileAddStuff(int applier, int victim, int value, flo
 
 void Func_FragileAddStuff(int attacker, int victim, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect, int SizeOfChar, char[] HudToDisplay)
 {
-	if(!Apply_StatusEffect.TotalOwners[attacker])
+	if(attacker == -1)
+	{
 		Format(HudToDisplay, SizeOfChar, "⭙");
+	}
 	else
-		Format(HudToDisplay, SizeOfChar, "⭙(%i/%.1f)", RoundFloat(Apply_StatusEffect.DataForUse) , Apply_StatusEffect.TimeUntillOver - GetGameTime());
+	{
+		if(!Apply_StatusEffect.TotalOwners[attacker])
+			Format(HudToDisplay, SizeOfChar, "⭙");
+		else
+			Format(HudToDisplay, SizeOfChar, "⭙(%i/%.1f)", RoundFloat(Apply_StatusEffect.DataForUse) , Apply_StatusEffect.TimeUntillOver - GetGameTime());
+	}
 }
 
 void DoDodgeEffect(int victim)
@@ -12027,16 +12046,17 @@ void StatusEffects_Gunsaw()
 	strcopy(data.HudDisplay, sizeof(data.HudDisplay), "*");
 	data.Positive 					= false;
 	data.ShouldScaleWithPlayerCount = false;
-	data.OnTakeDamage_TakenFunc		= ShrapnelDamageTaken;
+	data.OnTakeDamage_PostVictim		= ShrapnelDamageTaken;
 	StatusEffect_AddGlobal(data);
 }
 
-static float ShrapnelDamageTaken(int attacker, int victim, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect, int damagetype, float damage)
+static void ShrapnelDamageTaken(int attacker, int victim, float damage, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect, int damagetype)
 {
+	if(i_HexCustomDamageTypes[victim] & ZR_DAMAGE_DO_NOT_APPLY_BURN_OR_BLEED)
+		return;
+	
 	if(Apply_StatusEffect.TotalOwners[attacker])
 		StartBleedingTimer(victim, attacker, damage * 0.15, 6, -1, damagetype);
-
-	return 1.0;
 }
 static void FuriosoAbilityStart(int victim, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect)
 {
@@ -12125,4 +12145,95 @@ static void BlackFlames_Timer(int entity, StatusEffect Apply_MasterStatusEffect,
 	E_AL_StatusEffects[entity].SetArray(ArrayPosition, Apply_StatusEffect);
 
 	//spray particles
+}
+
+
+
+void StatusEffects_NothingThere()
+{
+	StatusEffect data;
+	//No translations
+	strcopy(data.BuffName, sizeof(data.BuffName), "Nothing There Internal");
+	strcopy(data.HudDisplay, sizeof(data.HudDisplay), "");
+	strcopy(data.AboveEnemyDisplay, sizeof(data.AboveEnemyDisplay), ""); //dont display above head, so empty
+	//-1.0 means unused
+	data.DamageTakenMulti 			= -1.0;
+	data.DamageDealMulti			= -1.0;
+	data.MovementspeedModif			= -1.0;
+	data.Positive 					= true;
+	data.ElementalLogic 			= true;
+	data.ShouldScaleWithPlayerCount = false;
+	data.Slot						= 0; //0 means ignored
+	data.SlotPriority				= 0; //if its higher, then the lower version is entirely ignored.
+	data.OnBuffEndOrDeleted			= NothingThereSpawn;
+	data.TimerRepeatCall_Func 		= NTTimerSpawnWarn;
+	StatusEffect_AddGlobal(data);
+}
+static void NTTimerSpawnWarn(int entity, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect)
+{
+	if(Apply_StatusEffect.DataForUse != 0.0)
+	{
+		return;
+	}
+	if(!NTCheckValidNpc(entity))
+		return;
+	int ArrayPosition = E_AL_StatusEffects[entity].FindValue(Apply_StatusEffect.BuffIndex, E_StatusEffect::BuffIndex);
+	if(Apply_StatusEffect.TimeUntillOver - 5.0 > GetGameTime())
+		return;
+
+	
+	FreezeNpcInTime(entity, 5.0);
+	Apply_StatusEffect.DataForUse = 1.0;
+	E_AL_StatusEffects[entity].SetArray(ArrayPosition, Apply_StatusEffect);
+
+	//spray particles
+}
+bool GurannteedForce;
+void ApplyNothingThereBuff(int victim)
+{
+	if(!HasNTOnServer())
+		return;
+	if(CurrentRound[Rounds_Default] <= 20)
+		return;
+	int AverageLevel = Waves_AverageLevelGet(120);
+	if(AverageLevel <= 75) //dontn spawn if too many noobs
+		return;
+	if(GurannteedForce || GetRandomFloat(0.0,1.0) < (0.015))
+	{
+		GurannteedForce = false;
+		ApplyStatusEffect(victim, victim, "Nothing There Internal", GetRandomFloat(30.0,60.0));
+	}
+}
+bool NTCheckValidNpc(int victim)
+{
+	//Prevent specific things from getting it
+	char npc_classname[60];
+	NPC_GetPluginById(i_NpcInternalId[victim], npc_classname, sizeof(npc_classname));
+	if(StrEqual(npc_classname, "npc_stalker_goggles") || 
+	StrEqual(npc_classname, "npc_drdam_special_delivery"))
+	{
+		GurannteedForce = true;
+		return false;
+	}
+	return true;
+}
+static void NothingThereSpawn(int victim, StatusEffect Apply_MasterStatusEffect, E_StatusEffect Apply_StatusEffect)
+{
+	if(!NTCheckValidNpc(victim))
+		return;
+	if(Apply_StatusEffect.DataForUse == 2.0)
+		return;
+	
+	int ArrayPosition = E_AL_StatusEffects[victim].FindValue(Apply_StatusEffect.BuffIndex, E_StatusEffect::BuffIndex);
+	Apply_StatusEffect.DataForUse = 2.0;
+	E_AL_StatusEffects[victim].SetArray(ArrayPosition, Apply_StatusEffect);
+
+	RequestFrame(KillNpc, EntIndexToEntRef(victim));
+	for(int i; i < 20; i++)
+		Npc_DoGibLogic(victim, 1.0, true);
+	float pos[3], ang[3];
+	GetEntPropVector(victim, Prop_Data, "m_vecOrigin", pos);
+	GetEntPropVector(victim, Prop_Data, "m_angRotation", ang);
+	
+	NPC_CreateByName("npc_nothing_there", -1, pos, ang, TFTeam_Red);
 }
