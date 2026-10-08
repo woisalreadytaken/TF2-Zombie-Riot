@@ -1773,6 +1773,14 @@
 		"it"		"Tiratore accurato"
 		"ko"		"정확한 명사수"
 	}
+	"Skull Piercing Rounds"
+	{
+		"en"		"Skull Piercing Rounds"
+	}
+	"Skull Piercing Rounds Desc"
+	{
+		"en"		"-Headshots deal 25％ more damage\n-Snipers no longer flinch when scoping"
+	}
 	"Ammo Coat"
 	{
 		"en"		"Ammo Coat"
@@ -2417,11 +2425,6 @@
 		"en"		"Living Armor"
 		"ru"		"Живая броня"
 		"ko"		"생체 장갑"
-	}
-	"Living Armor Desc"
-	{
-		"en"		"-Armor now regens 3 seconds after being hurt\n-Armor icon changes\n-Max Armor is 25％ less\n-Armor protects only 50％ instead of 75％\n-Cant get armor from buildings"
-		"ko"		"-3초 동안 피해를 입지 않으면 아머 재생\n-아머 아이콘 변경, 최대 아머 -25％\n-아머의 피해 방어가 75％에서 50％로 감소\n-구조물에서 아머 획득 불가"
 	}
 	"Living Armor Chat"
 	{
