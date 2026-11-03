@@ -909,6 +909,16 @@
 		"en"	"Blocks 100％ of the damage untill shield is broken\nOverdamage is delt as damage to you\nDoesnt protect from true damage."
 		"ko"	"방어막이 파괴되기 전까지 피해량의 100％를 방어합니다.\n초과된 피해는 그대로 받게 됩니다.\n트루 데미지를 방어하지는 못합니다."
 	}
+	"Shielding Reduce"
+	{
+		"en"	"Shielding Reduce"
+		"ko"	"방비 약화"
+	}
+	"Shielding Reduce Desc"
+	{
+		"en"	"Your Shield gain is halved, youre in battle for too long."
+		"ko"	"전투 상태가 오래 지속되어 방비 보호막 획득량이 감소합니다."
+	}
 	"Hussar's Warscream"
 	{
 		"en"	"Hussar's Warscream"
@@ -1450,9 +1460,9 @@
 	}
 	"Tonic Affliction Desc"
 	{
-		"en"	"Increases attack/reload speed & healrate by 100％\n{crimson}Decreases damage dealt by 40％"
+		"en"	"Increases attack/reload speed & healrate by 60％\n{crimson}Decreases damage dealt by 15％"
 		"it"	"Aumenta la velocità di attacco/ricarica e la velocità di guarigione del 100％\n{crimson}Diminuisce i danni inflitti del 40％"
-		"ko"	"공격 속도, 재장전 속도 및 치유 속도를 100％ 증가시킵니다.\n{crimson}공격 피해량은 40％ 감소합니다."
+		"ko"	"공격 속도, 재장전 속도 및 치유 속도를 60％ 증가시킵니다.\n{crimson}공격 피해량은 15％ 감소합니다."
 	}
 	"Tonic Affliction Hide"
 	{
@@ -2213,10 +2223,10 @@
 	}
 	"Weapon Overclock Desc"
 	{
-		"en"	"Increases damage by 40％\nBoosts attack/reload speed & healrate by 33％ and mana is continuously restored.\n-During raids, uber duration is cut by 35％"
-		"es"	"Aumenta el daño hecho en un 40％.\nAumenta la velocidad de ataque/recarga y curacion medica en un 33％.\nOtorga regeneracion continua de mana."
-		"it"	"Aumenta i danni del 40％ e aumenta la velocità di attacco/ricarica e la velocità di guarigione del 33％ \nil mana viene ripristinato continuamente."
-		"ko"	"피해량이 40％ 증가합니다.\n공격 속도, 재장전 속도 및 치유 속도가 33％ 증가하며 마나가 지속적으로 회복됩니다\n레이드 모드일 경우 우버 효과의 지속 시간이 35％ 감소합니다."
+		"en"	"Increases damage by 10％\nBoosts attack/reload speed & healrate by 33％ and mana is continuously restored."
+		"es"	"Aumenta el daño hecho en un 10％.\nAumenta la velocidad de ataque/recarga y curacion medica en un 33％.\nOtorga regeneracion continua de mana."
+		"it"	"Aumenta i danni del 10％ e aumenta la velocità di attacco/ricarica e la velocità di guarigione del 33％ \nil mana viene ripristinato continuamente."
+		"ko"	"피해량이 10％ 증가합니다.\n공격 속도, 재장전 속도 및 치유 속도가 33％ 증가하며 마나가 지속적으로 회복됩니다."
 	}
 	"Weapon Clocking"
 	{
@@ -2429,6 +2439,16 @@
 		"en"	"+30％ damage dealt, healing done, and +20％ damage reduction"
 		"it"	"+30％ danni inflitti, guarigione effettuata e +20％ riduzione dei danni"
 		"ko"	"공격 피해량, 치유량이 30％ 증가하고, 피해 저항력이 20％ 증가합니다."
+	}
+	"Empty Notes"
+	{
+		"en"	"''Empty Notes''"
+		"ko"	"''텅 빈 노트''"
+	}
+	"Empty Notes Desc"
+	{
+		"en"	"+5％ stats up\n{crimson}Notes that mute all...\nOpera gives shield to nearby Ritualists\nOpera gets tango buff for 1.5x duration\n1.25x necrosis buildup"
+		"ko"	"능력치 +5％\n{crimson}모든 것을 고요하게 하는 노트들...\n오페라가 주위의 의식주의자에게 보호막을 부여\n오페라 사용자의 자유로운 탱고 지속 시간 1.5배\n쇠약 원소 피해 부여량 1.25배"
 	}
 	"Charging Raigeki"
 	{
@@ -4021,26 +4041,32 @@
 	"Vulnerability Hex"
 	{
 		"en"	"Vulnerability Hex"
+		"ko"	"취약의 저주"
 	}
 	"Vulnerability Hex Desc"
 	{
 		"en"	"Take 15%% more damage\n15%% slower movement speed"
+		"ko"	"받는 피해량이 15％ 증가합니다.\n이동 속도가 15％ 감소합니다."
 	}
 	"Weakening Hex"
 	{
 		"en"	"Weakening Hex"
+		"ko"	"약화의 저주"
 	}
 	"Weakening Hex Desc"
 	{
 		"en"	"Deal 15%% less damage\nAttack 15%% slower"
+		"ko"	"공격 피해량이 15％ 감소합니다.\n공격 속도가 15％ 감소합니다."
 	}
 	"Small Hex"
 	{
 		"en"	"Small Hex"
+		"ko"	"작은 저주"
 	}
 	"Small Hex Desc"
 	{
 		"en"	"Take 5%% more damage\nDeal 5%% less damage\nMove 5%% slower\nAttack 5%% slower"
+		"ko"	"받는 피해량이 5％ 증가합니다.\n공격 피해량이 5％ 감소합니다.\n이동 속도가 5％ 감소합니다.\n공격 속도가 5％ 감소합니다."
 	}
 	"Poise"
 	{

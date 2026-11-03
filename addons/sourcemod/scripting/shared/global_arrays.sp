@@ -200,6 +200,8 @@ Handle g_hSetLocalAngles;
 Handle g_hSnapEyeAngles;
 Handle g_hSetAbsVelocity;
 ArrayList RecentSoundList[MAXPLAYERS];
+int PapModeDo = 0;
+int PerkModeDo = 0;
 
 float f_PlayerLastKeyDetected[MAXPLAYERS];
 float f_BotDelayShow[MAXPLAYERS];
@@ -640,6 +642,7 @@ float max_mana[MAXPLAYERS];
 
 
 
+float f_AniSoundSpam[MAXPLAYERS];
 int Current_Mana[MAXPLAYERS];
 float Mana_Hud_Delay[MAXPLAYERS];
 int i_WandIdNumber[MAXENTITIES]; //This is to see what wand is even used. so it does its own logic and so on.
@@ -984,6 +987,6 @@ bool g_PrecachedMatrixNPCs;
 int ZoneMarkerRef[Zone_MAX] = {-1, ...};
 ArrayList CurrentCollection;
 ArrayList Artifacts;
-ArrayList E_AL_StatusEffects[MAXENTITIES];
 #endif
 bool CanUseBuilding[MAXENTITIES][MAXPLAYERS];
+ArrayList E_AL_StatusEffects[MAXENTITIES];

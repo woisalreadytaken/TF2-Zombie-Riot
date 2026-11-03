@@ -232,6 +232,7 @@ stock bool Damage_AnyVictim(int victim, int &attacker, int &inflictor, float &da
 		if(b_ThisWasAnNpc[attacker])
 			f_InBattleDelay[attacker] = GetGameTime() + 6.0;
 #endif
+#if defined ZR
 	if(!b_IsATriggerHurt[attacker] && (Arena_Mode() || (attacker <= MaxClients && attacker > 0 && victim > 0 && victim <= MaxClients)))
 	{
 		//in PVP scenarios, we nerf damage by 10x
@@ -282,6 +283,7 @@ stock bool Damage_AnyVictim(int victim, int &attacker, int &inflictor, float &da
 			}
 		}
 	}
+#endif
 	return false;
 }
 
@@ -301,13 +303,13 @@ stock bool Damage_PlayerVictim(int victim, int &attacker, int &inflictor, float 
 
 	if(!CheckInHud())
 		HudDamageIndicator(victim,damagetype, false);
+	float GameTime = GetGameTime();
 #if defined ZR
 
 	
 	if(VIPBuilding_Active())
 		return true;
 	
-	float GameTime = GetGameTime();
 
 	//FOR ANY WEAPON THAT NEEDS CUSTOM LOGIC WHEN YOURE HURT!!
 	//It will just return the same damage if nothing is done.
@@ -328,7 +330,7 @@ stock bool Damage_PlayerVictim(int victim, int &attacker, int &inflictor, float 
 		if(RaidbossIgnoreBuildingsLogic(1) && i_HealthBeforeSuit[victim] > 0)
 		{
 			if(!(i_HexCustomDamageTypes[victim] & ZR_ELEMENTAL_QUANTUM))
-				damage *= 3.0;	//when a raid is alive, make quantum armor bad at tanking
+				damage *= 1.5;	//when a raid is alive, make quantum armor bad at tanking
 		}
 	}
 	
@@ -1573,7 +1575,7 @@ static stock float NPC_OnTakeDamage_Equipped_Weapon_Logic(int victim, int &attac
         case WEAPON_KIT_OMEGA_GAUSS:
         {
             if(!CheckInHud())
-            KitOmega_NPCTakeDamage_Gauss(attacker, victim, damage, weapon);
+           	 KitOmega_NPCTakeDamage_Gauss(attacker, victim, damage, weapon);
         }
         case WEAPON_KIT_PURGE_ANNAHILATOR:
         {

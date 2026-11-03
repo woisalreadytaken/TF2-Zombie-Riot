@@ -342,7 +342,8 @@ enum
 	WEAPON_BRICK = 165,
 	WEAPON_BURNINGTHUMB = 166,
 	WEAPON_RED_MIST = 167,
-	WEAPON_GUNSAW = 168
+	WEAPON_GUNSAW = 168,
+	WEAPON_OPERAMUTE = 169
 }
 
 enum
@@ -499,8 +500,6 @@ enum
 	PERK_MODE_ALL_ALLOW
 }
 
-int PapModeDo = PAP_MODE_DEFAULT;
-int PerkModeDo = PERK_MODE_DEFAULT;
 	
 bool DisableSpawnProtection;
 bool DisableRandomSpawns;
@@ -585,7 +584,6 @@ char s_MissionClient[64]; // Who hired us for the current job
 
 #include "npc.sp"	// Global NPC List
 
-#include "vscript.sp"
 #include "aprilfools_settings.sp"
 #include "building.sp"
 #include "database.sp"
@@ -770,6 +768,7 @@ char s_MissionClient[64]; // Who hired us for the current job
 #include "custom/kit_barracks.sp"
 #include "custom/kit_indexfather.sp"
 #include "custom/kit_gunsaw.sp"
+#include "custom/weapon_operamute.sp"
 
 void ZR_PluginLoad()
 {
@@ -866,7 +865,6 @@ void ZR_PluginStart()
 	Kritzkrieg_PluginStart();
 	BetWar_PluginStart();
 	Dungeon_PluginStart();
-	VScript_PluginStart();
 	IndexFather_PluginStart();
 	Format(WhatDifficultySetting_Internal, sizeof(WhatDifficultySetting_Internal), "%s", "No Difficulty Selected Yet");
 	Format(WhatDifficultySetting, sizeof(WhatDifficultySetting), "%s", "No Difficulty Selected Yet");

@@ -153,7 +153,17 @@ int Elemental_TriggerDamage(int entity, int type)
 
 	switch(type)
 	{
-		case Element_Necrosis, Element_Nervous:
+		case Element_Necrosis:
+		{
+		/*
+			if(GetTeam(entity) == TFTeam_Red)
+				return 1000;
+			
+			return b_thisNpcIsABoss[entity] ? 25000 : 12500;
+		*/
+			divide = 1.2;
+		}
+		case Element_Nervous:
 		{
 		/*
 			if(GetTeam(entity) == TFTeam_Red)
@@ -203,6 +213,10 @@ int Elemental_TriggerDamage(int entity, int type)
 		{
 			// Don't scale more with bosses
 		}
+		/*case Element_Necrosis:
+		{
+			// Don't scale more with bosses
+		}*/
 		/*case Element_Necrosis, Element_Nervous:
 		{
 			// Don't scale more with bosses
@@ -347,7 +361,7 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -441,6 +455,10 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 						multi = Attributes_Get(weapon, 410, 1.0);
 						if(multi > 0.0)
 							bleedDamage *= multi;
+
+						multi = Attributes_Get(weapon, Attrib_Elemental_DmgBoost, 1.0);
+						if(multi > 0.0)
+							bleedDamage *= multi;
 					}
 					else
 					{
@@ -497,7 +515,7 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -658,7 +676,7 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -836,7 +854,7 @@ void Elemental_AddCyroDamage(int victim, int attacker, int damagebase, int type)
 	}
 }
 
-void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int weapon = -1)
+void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int weapon = -1, bool DoSound = false)
 {
 	if(i_IsVehicle[victim])
 	{
@@ -847,11 +865,15 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 	
 	if(b_NpcIsInvulnerable[victim])
 		return;
-
+	
 	int damage = RoundFloat(damagebase * fl_Extra_Damage[attacker]);
 	if(NpcStats_ElementalAmp(victim))
 	{
 		damage = RoundToNearest(float(damage) * 1.3);
+	}
+	if(HasSpecificBuff(attacker, "Empty Notes"))
+	{
+		damage = RoundToNearest(float(damage) * 1.25);
 	}
 	if(victim <= MaxClients || Arena_Mode())
 		damage = RoundFloat(damage * GLOBAL_ELEMENTAL_NERF_PLAYER);
@@ -871,7 +893,7 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -948,6 +970,10 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 					multi = Attributes_Get(weapon, 410, 1.0);
 					if(multi > 0.0)
 						bleedDamage *= multi;
+
+					multi = Attributes_Get(weapon, Attrib_Elemental_DmgBoost, 1.0);
+					if(multi > 0.0)
+						bleedDamage *= multi;
 				}
 				else
 				{
@@ -961,6 +987,9 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 					time = 3.0;
 				
 				ApplyStatusEffect(attacker, victim, "Enfeeble", time);
+				//tell them they did this
+				if(attacker && attacker <= MaxClients && DoSound)
+					EmitSoundToClient(attacker, "beams/beamstart5.wav", attacker, SNDCHAN_STATIC, _, _, 0.6, 60);
 			}
 
 			if(attacker && attacker <= MaxClients)
@@ -1091,7 +1120,7 @@ void Elemental_AddCorruptionDamage(int victim, int attacker, int damagebase, boo
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1343,7 +1372,7 @@ void Elemental_AddPlasmicDamage(int victim, int attacker, int damagebase, int we
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1537,7 +1566,7 @@ void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool so
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 1.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1839,7 +1868,7 @@ void Elemental_AddStaggerDamage(int victim, int attacker, int damagebase)
 	{
 		if(f_ArmorCurrosionImmunity[victim][Element_Stagger] < GetGameTime())
 		{
-			if(GetClientHealth(victim) < (damage / 100))
+			if(damage > 0 && GetClientHealth(victim) < damage)
 			{
 				if(HasSpecificBuff(victim, "Stagger+") || HasSpecificBuff(victim, "Stagger++"))
 				{

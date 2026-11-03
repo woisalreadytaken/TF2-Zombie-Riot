@@ -1776,10 +1776,12 @@
 	"Skull Piercing Rounds"
 	{
 		"en"		"Skull Piercing Rounds"
+		"ko"		"두개골 관통 탄환"
 	}
 	"Skull Piercing Rounds Desc"
 	{
 		"en"		"-Headshots deal 25％ more damage\n-Snipers no longer flinch when scoping"
+		"ko"		"-헤드샷 피해량 +25％\n-저격소총 계열 무기로 조준할 때 조준선이 흔들리지 않습니다."
 	}
 	"Ammo Coat"
 	{
@@ -2045,6 +2047,11 @@
 		"chi"		"全套防暴装备"
 		"it"		"Set di equipaggiamento antisommossa"
 		"ko"		"진압 장비 세트"
+	}
+	"Grigori's Special Antidote"
+	{
+		"en"		"[SPECIAL] Grigori's Special Antidote"
+		"ko"		"[특별 상품] 그리고리의 특별한 항독제"
 	}
 	"Healthy Apple from Bob"
 	{
@@ -5327,7 +5334,7 @@
 		"it" "Cervello incasinato di formaggio"
 		"ko" "난잡해진 치즈 뇌"
 	}
-	"Birdeye Ammo"
+	"Birdeye's Ammo"
 	{
 		"en" "Birdeye's Ammo"
 		"it" "Munizioni di Birdeye"

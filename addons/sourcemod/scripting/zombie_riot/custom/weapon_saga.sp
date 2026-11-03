@@ -97,12 +97,15 @@ bool Saga_IsChargeWeapon(int client, int weapon)
 	return false;
 }
 
-void Saga_ChargeReduction(int client, int weapon, float time)
+void Saga_ChargeReduction(int client, int weapon, float time, float Cooldownmin = 999999.0)
 {
-	Passanger_ChargeReduced(client, time);
-	Gladiia_ChargeReduction(client, weapon, time);
+	if(Cooldownmin >= 99999.9)
+	{
+		Passanger_ChargeReduced(client, time);
+		Gladiia_ChargeReduction(client, weapon, time);
+	}
 
-	if(WeaponTimer[client] && EntRefToEntIndex(WeaponRef[client]) == weapon)
+	if(Cooldownmin >= 99999.9 && WeaponTimer[client] && EntRefToEntIndex(WeaponRef[client]) == weapon)
 	{
 		WeaponCharge[client] += Int_CooldownReductionDo(client, RoundToNearest(time)) + 1;
 		TriggerTimer(WeaponTimer[client], false);
@@ -111,7 +114,7 @@ void Saga_ChargeReduction(int client, int weapon, float time)
 	for(int i = 1; i < 4; i++)
 	{
 		float cooldown = Ability_Check_Cooldown(client, i, weapon);
-		if(cooldown > 0.0)
+		if(cooldown > 0.0 && Cooldownmin > cooldown)
 		{
 			Ability_Apply_Cooldown(client, i, cooldown - time, weapon, true);
 			break;
